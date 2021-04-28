@@ -1,0 +1,81 @@
+C51 COMPILER V9.57.0.0   BIANMAQI                                                          04/28/2021 20:58:27 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE BIANMAQI
+OBJECT MODULE PLACED IN .\Out_File\bianmaqi.obj
+COMPILER INVOKED BY: E:\keil5\anzhuang\C51\BIN\C51.EXE HARDWORE\BianMaQi\bianmaqi.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE 
+                    -INCDIR(..\..\Libraries\libraries;..\..\Libraries\seekfree_libraries;..\..\Libraries\seekfree_peripheral;..\USER\inc;..\U
+                    -SER\src;..\CODE;.\HARDWORE\Data;.\HARDWORE\DianGan;.\HARDWORE\FusionAngle;.\HARDWORE\BianMaQi;.\HARDWORE\ShangWeiJi;.\HA
+                    -RDWORE;.\HARDWORE\Balance;.\KaErMan) DEBUG PRINT(.\Out_File\bianmaqi.lst) TABS(2) OBJECT(.\Out_File\bianmaqi.obj)
+
+line level    source
+
+   1          #include "headfile.h"
+   2          
+   3          void caibianmaqi(void)
+   4          {
+   5   1        
+   6   1        bianmaqi_p04=(float)ctimer_count_read(CTIM3_P04);
+   7   1      //  bianmaqi_p06=2*(float)ctimer_count_read(CTIM4_P06);
+   8   1        ctimer_count_clean(CTIM3_P04);
+   9   1      //  ctimer_count_clean(CTIM4_P06);
+  10   1      //  bianmaqi_p23=P2^3;
+  11   1      //  if(P4^2==0)
+  12   1      //  if(bianmaqi_p23==252)
+  13   1      //    bianmaqi_p06=-bianmaqi_p06;//每读一次都会清零
+  14   1        
+  15   1      }
+  16          
+  17          
+  18          //#define p 38
+  19          //#define i 0.7
+  20          //float sudu_car=0,sudu_new=0,sudu_last=0;
+  21          //float sudu_sheding=10,sudu_error=0,sudu_ierror=0;
+  22          //float g_fsuducontrolout;
+  23          //uint8 sudu_period=1;
+  24          //void chuli_bianmaqi(void){
+  25          
+  26          //  sudu_car=(bianmaqi_p04+bianmaqi_p06)/2;
+  27          //  sudu_error=(sudu_sheding-sudu_car)*0.01;
+  28          //  sudu_ierror+=sudu_error;
+  29          //  sudu_last=sudu_new;
+  30          //  
+  31          //  sudu_new=sudu_error*p+i*sudu_ierror*i;
+  32          //  if(sudu_ierror>10)sudu_ierror=10;
+  33          //  if(sudu_ierror<-10)sudu_ierror=-10;
+  34          //  if(sudu_new>40)sudu_new=40;
+  35          //  if(sudu_new<-40)sudu_new=-40;
+  36          //  sudu_period=1;//周期比为5： 1在这控制周期
+  37          //}
+  38          
+  39          
+  40          ////chuli_sudu 和shuchu_sudu的运行周期不一样。
+  41          //void shuchu_bianmaqi(void){
+  42          
+  43          //  float fvalue=0;
+  44          //  fvalue=sudu_new-sudu_last;
+  45          //  if(g_fsuducontrolout>15)fvalue=0;//shiyan
+  46          //  g_fsuducontrolout=sudu_last+sudu_period*fvalue/5;//输出的角度值
+  47          //  sudu_period+=1;
+  48          //    
+  49          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+C51 COMPILER V9.57.0.0   BIANMAQI                                                          04/28/2021 20:58:27 PAGE 2   
+
+   CODE SIZE        =     24    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

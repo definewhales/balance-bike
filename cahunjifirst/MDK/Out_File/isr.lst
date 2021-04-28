@@ -1,0 +1,288 @@
+C51 COMPILER V9.57.0.0   ISR                                                               04/28/2021 20:58:26 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE ISR
+OBJECT MODULE PLACED IN .\Out_File\isr.obj
+COMPILER INVOKED BY: E:\keil5\anzhuang\C51\BIN\C51.EXE ..\USER\src\isr.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\.
+                    -.\Libraries\libraries;..\..\Libraries\seekfree_libraries;..\..\Libraries\seekfree_peripheral;..\USER\inc;..\USER\src;..\
+                    -CODE;.\HARDWORE\Data;.\HARDWORE\DianGan;.\HARDWORE\FusionAngle;.\HARDWORE\BianMaQi;.\HARDWORE\ShangWeiJi;.\HARDWORE;.\HA
+                    -RDWORE\Balance;.\KaErMan) DEBUG PRINT(.\Out_File\isr.lst) TABS(2) OBJECT(.\Out_File\isr.obj)
+
+line level    source
+
+   1          /*********************************************************************************************************
+             -************
+   2           * COPYRIGHT NOTICE
+   3           * Copyright (c) 2020,逐飞科技
+   4           * All rights reserved.
+   5           * 技术讨论QQ群：一群：179029047(已满)  二群：244861897(已满)  三群：824575535
+   6           *
+   7           * 以下所有内容版权均属逐飞科技所有，未经允许不得用于商业用途，
+   8           * 欢迎各位使用并传播本程序，修改内容时必须保留逐飞科技的版权声明。
+   9           *
+  10           * @file          isr
+  11           * @company       成都逐飞科技有限公司
+  12           * @author        逐飞科技(QQ790875685)
+  13           * @version       查看doc内version文件 版本说明
+  14           * @Software    MDK FOR C51 V9.60
+  15           * @Target core   STC8H8K64S4
+  16           * @Taobao      https://seekfree.taobao.com/
+  17           * @date          2020-4-14
+  18           *********************************************************************************************************
+             -***********/
+  19          #include "headfile.h"
+  20          
+  21          //UART1中断
+  22          void UART1_Isr() interrupt 4
+  23          {
+  24   1          uint8 res;
+  25   1        static uint8 dwon_count;
+  26   1          if(UART1_GET_TX_FLAG)
+  27   1          {
+  28   2              UART1_CLEAR_TX_FLAG;
+  29   2              busy[1] = 0;
+  30   2          }
+  31   1          if(UART1_GET_RX_FLAG)
+  32   1          {
+  33   2              UART1_CLEAR_RX_FLAG;
+  34   2              res = SBUF;
+  35   2              //程序自动下载
+  36   2              if(res == 0x7F)
+  37   2              {
+  38   3                  if(dwon_count++ > 20)
+  39   3                      IAP_CONTR = 0x60;
+  40   3              }
+  41   2              else
+  42   2              {
+  43   3                  dwon_count = 0;
+  44   3              }
+  45   2          }
+  46   1      }
+  47          
+  48          //UART2中断
+  49          void UART2_Isr() interrupt 8
+  50          {
+C51 COMPILER V9.57.0.0   ISR                                                               04/28/2021 20:58:26 PAGE 2   
+
+  51   1          if(UART2_GET_TX_FLAG)
+  52   1        {
+  53   2              UART2_CLEAR_TX_FLAG;
+  54   2          busy[2] = 0;
+  55   2        }
+  56   1          if(UART2_GET_RX_FLAG)
+  57   1        {
+  58   2              UART2_CLEAR_RX_FLAG;
+  59   2          //接收数据寄存器为：S2BUF
+  60   2      
+  61   2        }
+  62   1      }
+  63          
+  64          
+  65          //UART3中断
+  66          void UART3_Isr() interrupt 17
+  67          {
+  68   1          if(UART3_GET_TX_FLAG)
+  69   1        {
+  70   2              UART3_CLEAR_TX_FLAG;
+  71   2          busy[3] = 0;
+  72   2        }
+  73   1          if(UART3_GET_RX_FLAG)
+  74   1        {
+  75   2              UART3_CLEAR_RX_FLAG;
+  76   2          //接收数据寄存器为：S3BUF
+  77   2      
+  78   2        }
+  79   1      }
+  80          
+  81          
+  82          //UART4中断
+  83          void UART4_Isr() interrupt 18
+  84          {
+  85   1          if(UART4_GET_TX_FLAG)
+  86   1        {
+  87   2              UART4_CLEAR_TX_FLAG;
+  88   2          busy[4] = 0;
+  89   2        }
+  90   1          if(UART4_GET_RX_FLAG)
+  91   1        {
+  92   2              UART4_CLEAR_RX_FLAG;
+  93   2          //S4BUF;
+  94   2      
+  95   2        }
+  96   1      }
+  97          
+  98          
+  99          
+ 100          void INT0_Isr() interrupt 0
+ 101          {
+ 102   1      
+ 103   1      }
+ 104          void INT1_Isr() interrupt 2
+ 105          {
+ 106   1      
+ 107   1      }
+ 108          void INT2_Isr() interrupt 10
+ 109          {
+ 110   1        INT2_CLEAR_FLAG;  //清除中断标志
+ 111   1      }
+ 112          void INT3_Isr() interrupt 11
+C51 COMPILER V9.57.0.0   ISR                                                               04/28/2021 20:58:26 PAGE 3   
+
+ 113          {
+ 114   1        INT3_CLEAR_FLAG;  //清除中断标志
+ 115   1      }
+ 116          
+ 117          void INT4_Isr() interrupt 16
+ 118          {
+ 119   1        INT4_CLEAR_FLAG;  //清除中断标志
+ 120   1      }
+ 121          
+ 122          void TM0_Isr() interrupt 1
+ 123          {
+ 124   1        static int Symbol_6ms = 0;
+ 125   1        static int Symbol_12ms = 0;
+ 126   1        if(Symbol_12ms >= 4){
+ 127   2          Symbol_12ms = 0;
+ 128   2          InductanceFilter();//电感滤波
+ 129   2          DirectionControl();//方向控制，将输出加入到角度上面
+ 130   2        }
+ 131   1        if(Symbol_6ms >= 2){
+ 132   2          Symbol_6ms = 0;
+ 133   2          get_icm20602_accdata_simiic();//采集acc，gyro融合角度
+ 134   2          get_icm20602_gyro_simiic();
+ 135   2          Angel_Calculate();//角度融合
+ 136   2          AngleControl();//角度控制，将输出加入到角速度
+ 137   2        }
+ 138   1        Symbol_6ms ++;
+ 139   1        Symbol_12ms ++;
+ 140   1        //以下为速度控制
+ 141   1        caibianmaqi();
+ 142   1        SpeedControl();
+ 143   1        pwm_duty(PWM7_P22,5000 + g_fSpeedControlOut);
+ 144   1        //以下为角速度控制
+ 145   1        gyroConOut();
+ 146   1        pwm_duty(PWM4N_P27,1330 + GyroConOutput);
+ 147   1      }
+ 148          void TM1_Isr() interrupt 3
+ 149          {
+ 150   1      
+ 151   1      }
+ 152          /**
+ 153          可以发送字节200/s
+ 154            static int biaozhi = 0;
+ 155            if(biaozhi == 0){
+ 156              mpu6050_get_accdata();
+ 157              mpu6050_get_gyro();
+ 158              Angel_Calculate();}
+ 159            if(biaozhi == 1){
+ 160            }
+ 161            if(biaozhi == 2){
+ 162            }
+ 163            if(biaozhi == 3){
+ 164            }
+ 165            biaozhi += 1;
+ 166            if(biaozhi == 3){
+ 167              biaozhi = 0;}
+ 168          */
+ 169          void TM2_Isr() interrupt 12
+ 170          {
+ 171   1      //  static int biaozhi = 0;
+ 172   1      //  TIM2_CLEAR_FLAG;  //清除中断标志
+ 173   1      //  switch(biaozhi){
+ 174   1      //    case 0:
+C51 COMPILER V9.57.0.0   ISR                                                               04/28/2021 20:58:26 PAGE 4   
+
+ 175   1      //      biaozhi += 1;
+ 176   1      //      mpu6050_get_accdata();
+ 177   1      //      mpu6050_get_gyro();
+ 178   1      ////      caibianmaqi();
+ 179   1      //      Angel_Calculate();
+ 180   1      ////      test_c();
+ 181   1      //      uart_putchar(UART_1,0xA5);
+ 182   1      //      break;
+ 183   1      //    case 1:
+ 184   1      //      biaozhi += 1;
+ 185   1      //      break;
+ 186   1      //    case 2:
+ 187   1      //      biaozhi += 1;
+ 188   1      //      break;
+ 189   1      //    case 3:
+ 190   1      //      biaozhi = 0;
+ 191   1      //      break;
+ 192   1      //  }
+ 193   1      }
+ 194          void TM3_Isr() interrupt 19
+ 195          {
+ 196   1        TIM3_CLEAR_FLAG; //清除中断标志
+ 197   1        
+ 198   1      }
+ 199          
+ 200          void TM4_Isr() interrupt 20
+ 201          {
+ 202   1      //  static int biaozhi = 0;
+ 203   1      //  switch(biaozhi){
+ 204   1      //    case 0:
+ 205   1      //      biaozhi += 1;
+ 206   1      //      mpu6050_get_accdata();
+ 207   1      //      mpu6050_get_gyro();
+ 208   1      ////      caibianmaqi();
+ 209   1      //      Angel_Calculate();
+ 210   1      //      break;
+ 211   1      //    case 1:
+ 212   1      //      biaozhi += 1;
+ 213   1      //      break;
+ 214   1      //    case 2:
+ 215   1      //      biaozhi += 1;
+ 216   1      //      break;
+ 217   1      //    case 3:
+ 218   1      //      biaozhi = 0;
+ 219   1      //      break;
+ 220   1      //  }
+ 221   1        TIM4_CLEAR_FLAG; //清除中断标志
+ 222   1        ccd_collect();
+ 223   1      
+ 224   1      }
+ 225          
+ 226          //void  INT0_Isr()  interrupt 0;
+ 227          //void  TM0_Isr()   interrupt 1;
+ 228          //void  INT1_Isr()  interrupt 2;
+ 229          //void  TM1_Isr()   interrupt 3;
+ 230          //void  UART1_Isr() interrupt 4;
+ 231          //void  ADC_Isr()   interrupt 5;
+ 232          //void  LVD_Isr()   interrupt 6;
+ 233          //void  PCA_Isr()   interrupt 7;
+ 234          //void  UART2_Isr() interrupt 8;
+ 235          //void  SPI_Isr()   interrupt 9;
+ 236          //void  INT2_Isr()  interrupt 10;
+C51 COMPILER V9.57.0.0   ISR                                                               04/28/2021 20:58:26 PAGE 5   
+
+ 237          //void  INT3_Isr()  interrupt 11;
+ 238          //void  TM2_Isr()   interrupt 12;
+ 239          //void  INT4_Isr()  interrupt 16;
+ 240          //void  UART3_Isr() interrupt 17;
+ 241          //void  UART4_Isr() interrupt 18;
+ 242          //void  TM3_Isr()   interrupt 19;
+ 243          //void  TM4_Isr()   interrupt 20;
+ 244          //void  CMP_Isr()   interrupt 21;
+ 245          //void  I2C_Isr()   interrupt 24;
+ 246          //void  USB_Isr()   interrupt 25;
+ 247          //void  PWM1_Isr()  interrupt 26;
+ 248          //void  PWM2_Isr()  interrupt 27;
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    527    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      5    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

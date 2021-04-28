@@ -1,0 +1,76 @@
+C51 COMPILER V9.57.0.0   DATA                                                              04/28/2021 20:58:27 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE DATA
+OBJECT MODULE PLACED IN .\Out_File\data.obj
+COMPILER INVOKED BY: E:\keil5\anzhuang\C51\BIN\C51.EXE HARDWORE\Data\data.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(.
+                    -.\..\Libraries\libraries;..\..\Libraries\seekfree_libraries;..\..\Libraries\seekfree_peripheral;..\USER\inc;..\USER\src;
+                    -..\CODE;.\HARDWORE\Data;.\HARDWORE\DianGan;.\HARDWORE\FusionAngle;.\HARDWORE\BianMaQi;.\HARDWORE\ShangWeiJi;.\HARDWORE;.
+                    -\HARDWORE\Balance;.\KaErMan) DEBUG PRINT(.\Out_File\data.lst) TABS(2) OBJECT(.\Out_File\data.obj)
+
+line level    source
+
+   1          #include "data.h"
+   2          /**
+   3          数据存储
+   4          */
+   5          
+   6            
+   7          
+   8            float g_fSpeedControlNow = 5000;    //改变的占空比，已用
+   9            float g_fSpeedControlOutNew = 0;  
+  10            float g_fSpeedControlOutOld = 0;
+  11            float g_fSpeedControlOutOOld = 0;
+  12            float g_fSpeedControlIntegral = 0;
+  13            float g_fSpeedControlOut = 0;
+  14          
+  15          
+  16            float g_fDirectionControlNow = 0;
+  17            float g_fDirectionControlOutNew = 0;
+  18            float g_fDirectionControlOutOld = 0;
+  19            float g_fDirectionControlOutOOld = 0;
+  20            float g_fDirectionControlOut = 0;
+  21            unsigned long LeftCol_1 = 0;
+  22            unsigned long LeftCol_2 = 0;
+  23            unsigned long RightCol_1 = 0;
+  24            unsigned long RightCol_2 = 0;
+  25          
+  26            float g_fAngleControlNow = 0;
+  27            float g_fAngleControlOutNew = 0;
+  28            float g_fAngleControlOutOld = 0;
+  29            float g_fAngleControlOutOOld = 0;
+  30            float g_fAngleControlOut = 0;
+  31            float g_fLeftMotorOut = 0;
+  32            float g_f_Car_Angle_I = 0;
+  33            float g_fRightMotorOut = 0;
+  34            float g_fCarAngle = 0;
+  35            float g_fGyroscopeAngleIntegral = 0;
+  36            float mpu_acc_xdeal = 0;
+  37            float mpu_gyro_xdeal = 0;
+  38            float bianmaqi_p04 = 0;
+  39            float turn_xianfu = 19;
+  40            
+  41            
+  42            float roll  = 0;
+  43            
+  44            float GyroConOutput = 0;
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    124    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+C51 COMPILER V9.57.0.0   DATA                                                              04/28/2021 20:58:27 PAGE 2   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

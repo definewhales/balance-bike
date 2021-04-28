@@ -1,0 +1,294 @@
+C51 COMPILER V9.57.0.0   BALENCE                                                           04/28/2021 20:58:27 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE BALENCE
+OBJECT MODULE PLACED IN .\Out_File\balence.obj
+COMPILER INVOKED BY: E:\keil5\anzhuang\C51\BIN\C51.EXE HARDWORE\Balance\balence.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE IN
+                    -CDIR(..\..\Libraries\libraries;..\..\Libraries\seekfree_libraries;..\..\Libraries\seekfree_peripheral;..\USER\inc;..\USE
+                    -R\src;..\CODE;.\HARDWORE\Data;.\HARDWORE\DianGan;.\HARDWORE\FusionAngle;.\HARDWORE\BianMaQi;.\HARDWORE\ShangWeiJi;.\HARD
+                    -WORE;.\HARDWORE\Balance;.\KaErMan) DEBUG PRINT(.\Out_File\balence.lst) TABS(2) OBJECT(.\Out_File\balence.obj)
+
+line level    source
+
+   1          #include "balence.h"
+   2          #include "headfile.h"
+   3          uint16 AD[4][5] = {0};
+   4          uint16 ADOld[4] = {0};
+   5          float DianGanBiLi[4] = {0};
+   6          float DianGanGuiYi[2] = {0};
+   7          /**
+   8          取绝对值的方法
+   9          */
+  10          float JueDuiZhi(float canshu){
+  11   1        if(canshu < 0){
+  12   2          canshu = -canshu;}
+  13   1        return canshu;
+  14   1        } 
+  15          //#define AngleOffset -13//+ g_fDirectionControlOut//8.65//-18.5//22跑的停稳
+  16          //#define AngleControl_P 6.4//4.54 5.73
+  17          //#define ANgleControl_I 0.072//.09//0.00285//0.0183
+  18          //#define AngleControl_D 0.16//0.043//
+  19          /**
+  20          位置式PID
+  21          角度控制函数
+  22          用全局变量输出控制 -19 0.13 7.5099 0 
+  23          */
+  24          float AngleOffset = -24.82;
+  25          float AngleControl_P = 0;
+  26          float ANgleControl_I = 0;
+  27          float AngleControl_D = 0;
+  28          void AngleControl(void){
+  29   1        float jifen = 0;
+  30   1        float angleoff = 0;
+  31   1        float Gyro_new = (mpu_gyro_x-40)*0.088;
+  32   1        static float Error = 0;//ErrorOld = 0;
+  33   1        angleoff =AngleOffset - g_fDirectionControlOut;//将方向输出加入到角度输出里面
+  34   1        Error = Angle_z-angleoff;
+  35   1        jifen +=Error;
+  36   1        if(jifen > 1000){
+  37   2          jifen = 1000;}
+  38   1        else if(jifen < -1000){
+  39   2          jifen = -1000;}
+  40   1        if(Gyro_new > 200){
+  41   2           Gyro_new = 200;}
+  42   1        else if(Gyro_new < -200){
+  43   2          Gyro_new = -200;}
+  44   1        g_fAngleControlOut = AngleControl_P*Error + ANgleControl_I*jifen + AngleControl_D*Gyro_new; 
+  45   1        if(g_fAngleControlOut > 250){
+  46   2          g_fAngleControlOut = 250;}
+  47   1        if(g_fAngleControlOut < -250){
+  48   2          g_fAngleControlOut = -250;}
+  49   1      }
+  50          /**
+  51          速度控制函数
+  52          增量式PID算法
+C51 COMPILER V9.57.0.0   BALENCE                                                           04/28/2021 20:58:27 PAGE 2   
+
+  53          测试速度会不会更稳定
+  54          */
+  55          //#define SpeedOffset 250
+  56          //#define SpeedControl_P 7
+  57          //#define SpeedControl_I 0.5
+  58          //#define SpeedControl_D 0
+  59          float SpeedOffset = 250;
+  60          float SpeedControl_P=0.8;
+  61          float SpeedControl_I=7;
+  62          float SpeedControl_D = 0;
+  63          void SpeedControl(){
+  64   1        g_fSpeedControlOutOOld = g_fSpeedControlOutOld;
+  65   1        g_fSpeedControlOutOld = g_fSpeedControlOutNew;
+  66   1        g_fSpeedControlOutNew = SpeedOffset - bianmaqi_p04;
+  67   1        g_fSpeedControlOut = SpeedControl_P*(g_fSpeedControlOutNew - g_fSpeedControlOutOld)+SpeedControl_I*g_fSpe
+             -edControlOutNew+SpeedControl_D*(g_fSpeedControlOutNew - 2*g_fSpeedControlOutOld+g_fSpeedControlOutOOld);
+  68   1        if(g_fSpeedControlOut>2000){
+  69   2          g_fSpeedControlOut = 2000;}
+  70   1        if(g_fSpeedControlOut<-2000){
+  71   2          g_fSpeedControlOut = -2000;}
+  72   1        }
+  73          /**
+  74          这个函数用于在速度控制的时候把角度加入
+  75          在转弯时减速
+  76          */
+  77          #define AngleSpeedHUNHE_P 6
+  78          int AngleSpeedHUNHE(float AngleBias){
+  79   1        if(AngleBias<0){
+  80   2          AngleBias = -AngleBias;}
+  81   1        return (int)(AngleBias*AngleSpeedHUNHE_P);
+  82   1        }
+  83          /**
+  84          *这是一个停车方法
+  85          *通过检测角度，查看车是否倒了
+  86          */
+  87          void TingChe(){
+  88   1        if(Angle_z >= 130||Angle_z <= -140){
+  89   2            DisableGlobalIRQ();
+  90   2            pwm_duty(PWM7_P22,5000);
+  91   2          }
+  92   1        }
+  93          //#define Direction_P 0
+  94          //#define Direction_I 0
+  95          //#define Direction_D 0
+  96          /**
+  97          *@方向方法
+  98          float DianGanBiLi[4] = {0};
+  99          float DianGanGuiYi[2] = {0};
+ 100          不做平滑处理
+ 101          */
+ 102          float Direction_P = 0;
+ 103          float Direction_I = 0;
+ 104          float Direction_D = 0;
+ 105          #define DIRMAX 1000.0
+ 106          void DirectionControl(){
+ 107   1        //PID要用
+ 108   1        static float Error = 0;
+ 109   1        static float ErrorOld = 0;
+ 110   1        //平滑处理用
+ 111   1        static float DirConError = 0;
+ 112   1        DianGanBiLi[0] = LeftCol_1/DIRMAX;
+ 113   1        DianGanBiLi[1] = LeftCol_2/DIRMAX;
+C51 COMPILER V9.57.0.0   BALENCE                                                           04/28/2021 20:58:27 PAGE 3   
+
+ 114   1        DianGanBiLi[2] = RightCol_2/DIRMAX;
+ 115   1        DianGanBiLi[3] = RightCol_1/DIRMAX;
+ 116   1        if(DianGanBiLi[0] != 0&&DianGanBiLi[3] != 0){
+ 117   2          DianGanGuiYi[0] = (DianGanBiLi[0]-DianGanBiLi[3])/(DianGanBiLi[0]+DianGanBiLi[3]);}
+ 118   1        ErrorOld = Error;
+ 119   1        Error = DianGanGuiYi[0];
+ 120   1        g_fDirectionControlOutOld = g_fDirectionControlOutNew;
+ 121   1        g_fDirectionControlOutNew = Direction_P*Error + Direction_D*(Error - ErrorOld);
+ 122   1        DirConError = g_fDirectionControlOutNew - g_fDirectionControlOutOld;
+ 123   1      //对每次的变化量限幅
+ 124   1      //  if(DirConError>10){
+ 125   1      //    DirConError = 10;}
+ 126   1      //  if(DirConError<-10){
+ 127   1      //    DirConError = -10;}
+ 128   1        g_fDirectionControlOut = DirConError + g_fDirectionControlOutOld;
+ 129   1      //对总输出量限幅
+ 130   1        if(g_fDirectionControlOut >turn_xianfu){
+ 131   2          g_fDirectionControlOut = turn_xianfu;}
+ 132   1        if(g_fDirectionControlOut<-turn_xianfu){
+ 133   2          g_fDirectionControlOut = -turn_xianfu;}
+ 134   1      }
+ 135          /**
+ 136          *电感滤波
+ 137          *模拟上一届节能
+ 138          */
+ 139          void InductanceFilter(){
+ 140   1        int ADMin[4] = {0};
+ 141   1        int ADMax[4] = {0};
+ 142   1        static unsigned long AdOld[4]; 
+ 143   1        uint32 ADSum[4] = {0};
+ 144   1        uint32 DianGan[4] = {0};
+ 145   1        int AdcCount = 0;
+ 146   1        int AdcColleteTimes = 0;
+ 147   1        //采集电感值
+ 148   1        for(AdcColleteTimes = 0;AdcColleteTimes<3;AdcColleteTimes++){
+ 149   2          AdOld[AdcColleteTimes] = DianGan[AdcColleteTimes];
+ 150   2        for(AdcColleteTimes = 0;AdcColleteTimes<5;AdcColleteTimes++){
+ 151   3          AD[0][AdcColleteTimes] = adc_once(ADC_P15,ADC_10BIT);
+ 152   3          AD[1][AdcColleteTimes] = adc_once(ADC_P10,ADC_10BIT);
+ 153   3          AD[2][AdcColleteTimes] = adc_once(ADC_P14,ADC_10BIT);
+ 154   3          AD[3][AdcColleteTimes] = adc_once(ADC_P11,ADC_10BIT);
+ 155   3        }
+ 156   2        //找最大最小值
+ 157   2        for(AdcColleteTimes = 0;AdcColleteTimes<5;AdcColleteTimes++){
+ 158   3          if(AD[0][AdcColleteTimes] < AD[0][ADMin[0]])
+ 159   3          {
+ 160   4            ADMin[0] = AdcColleteTimes;
+ 161   4          }
+ 162   3          if(AD[1][AdcColleteTimes] < AD[1][ADMin[1]])
+ 163   3          {
+ 164   4            ADMin[1] = AdcColleteTimes;
+ 165   4          }
+ 166   3          if(AD[2][AdcColleteTimes] < AD[2][ADMin[2]])
+ 167   3          {
+ 168   4            ADMin[2] = AdcColleteTimes;
+ 169   4          }
+ 170   3          if(AD[3][AdcColleteTimes] < AD[3][ADMin[3]])
+ 171   3          {
+ 172   4            ADMin[3] = AdcColleteTimes;
+ 173   4          }
+ 174   3        }
+ 175   2        for(AdcColleteTimes = 0;AdcColleteTimes<5;AdcColleteTimes++){
+C51 COMPILER V9.57.0.0   BALENCE                                                           04/28/2021 20:58:27 PAGE 4   
+
+ 176   3          if(AD[0][AdcColleteTimes] > AD[0][ADMax[0]])
+ 177   3          {
+ 178   4            ADMax[0] = AdcColleteTimes;
+ 179   4          }
+ 180   3          if(AD[1][AdcColleteTimes] > AD[1][ADMax[1]])
+ 181   3          {
+ 182   4            ADMax[1] = AdcColleteTimes;
+ 183   4          }
+ 184   3          if(AD[2][AdcColleteTimes] > AD[2][ADMax[2]])
+ 185   3          {
+ 186   4            ADMax[2] = AdcColleteTimes;
+ 187   4          }
+ 188   3          if(AD[3][AdcColleteTimes] > AD[3][ADMax[3]])
+ 189   3          {
+ 190   4            ADMax[3] = AdcColleteTimes;
+ 191   4          }
+ 192   3        }
+ 193   2        for(AdcCount = 0;AdcCount<4;AdcCount++){
+ 194   3          ADOld[AdcCount] = AD[AdcCount][ADMax[AdcCount]];
+ 195   3        }
+ 196   2        //将最大最小值置0
+ 197   2        for(AdcCount = 0;AdcCount<4;AdcCount++){
+ 198   3          AD[AdcCount][ADMin[AdcCount]] = 0;
+ 199   3          AD[AdcCount][ADMax[AdcCount]] = 0;
+ 200   3      }
+ 201   2        //求和
+ 202   2      for(AdcColleteTimes = 0;AdcColleteTimes<5;AdcColleteTimes++){
+ 203   3        ADSum[0] += (uint32)AD[0][AdcColleteTimes];
+ 204   3        ADSum[1] += (uint32)AD[1][AdcColleteTimes];
+ 205   3        ADSum[2] += (uint32)AD[2][AdcColleteTimes];
+ 206   3        ADSum[3] += (uint32)AD[3][AdcColleteTimes];
+ 207   3      }
+ 208   2      //平均
+ 209   2      DianGan[0] = ADSum[0]/3.0;
+ 210   2      DianGan[1] = ADSum[1]/3.0;
+ 211   2      DianGan[2] = ADSum[2]/3.0;
+ 212   2      DianGan[3] = ADSum[3]/3.0;
+ 213   2      if (DianGan[0]>=1024)DianGan[0]=1024;
+ 214   2      if (DianGan[1]>=1024)DianGan[1]=1024;
+ 215   2      if (DianGan[2]>=1024)DianGan[2]=1024;
+ 216   2      if (DianGan[3]>=1024)DianGan[3]=1024;
+ 217   2      //if(DianGan[0]<=200)DianGan[0] = 200;
+ 218   2      //if(DianGan[1]<=200)DianGan[1] = 200;
+ 219   2      //if(DianGan[2]<=200)DianGan[2] = 200;
+ 220   2      //if(DianGan[3]<=200)DianGan[3] = 200;
+ 221   2      }
+ 222   1      LeftCol_1 = DianGan[0];
+ 223   1      LeftCol_2 = DianGan[1];
+ 224   1      RightCol_2 = DianGan[2];
+ 225   1      RightCol_1 = DianGan[3];
+ 226   1      }
+ 227          
+ 228          /**
+ 229          @角速度输出方法
+ 230          @最内环输出
+ 231          @PD调节。响应速度
+ 232          */
+ 233          //#define GYROCON_P 0
+ 234          //#define GYROCON_I 0
+ 235          //#define GYROCON_D 0
+ 236          float GyroCon_P = 0;
+ 237          float GyroCon_I = 0;
+C51 COMPILER V9.57.0.0   BALENCE                                                           04/28/2021 20:58:27 PAGE 5   
+
+ 238          float GyroCon_D = 0;
+ 239          void gyroConOut(){
+ 240   1        static float Error = 0;
+ 241   1        static float ErrorOld = 0;
+ 242   1        static float Integral = 0;
+ 243   1        get_icm20602_gyro_simiic();
+ 244   1        ErrorOld = Error;
+ 245   1        Error = g_fDirectionControlOut - icm_gyro_x*0.0610;//初始化20602gyro为2000，4000/2^16 = 0.0610
+ 246   1        Integral += Error;
+ 247   1        GyroConOutput = GyroCon_P * Error + GyroCon_I * Integral + GyroCon_D*(Error - ErrorOld);
+ 248   1        //对舵机输出量限幅
+ 249   1        if(GyroConOutput > 300){
+ 250   2          GyroConOutput = 300;
+ 251   2        }
+ 252   1        if(GyroConOutput < -300){
+ 253   2          GyroConOutput = -300;
+ 254   2        }
+ 255   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   4046    ----
+   CONSTANT SIZE    =     48    ----
+   XDATA SIZE       =    172      68
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

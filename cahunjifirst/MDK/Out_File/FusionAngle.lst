@@ -1,0 +1,30 @@
+C51 COMPILER V9.57.0.0   FUSIONANGLE                                                       03/25/2021 18:24:16 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE FUSIONANGLE
+OBJECT MODULE PLACED IN .\Out_File\FusionAngle.obj
+COMPILER INVOKED BY: E:\keil5\anzhuang\C51\BIN\C51.EXE HARDWORE\FusionAngle\FusionAngle.c LARGE OMF2 OPTIMIZE(8,SPEED) B
+                    -ROWSE INCDIR(..\..\Libraries\libraries;..\..\Libraries\seekfree_libraries;..\..\Libraries\seekfree_peripheral;..\USER\in
+                    -c;..\USER\src;..\CODE;.\HARDWORE\Data) DEBUG PRINT(.\Out_File\FusionAngle.lst) TABS(2) OBJECT(.\Out_File\FusionAngle.obj
+                    -)
+
+line level    source
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

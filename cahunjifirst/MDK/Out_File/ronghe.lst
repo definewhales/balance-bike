@@ -1,0 +1,158 @@
+C51 COMPILER V9.57.0.0   RONGHE                                                            04/28/2021 20:58:27 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE RONGHE
+OBJECT MODULE PLACED IN .\Out_File\ronghe.obj
+COMPILER INVOKED BY: E:\keil5\anzhuang\C51\BIN\C51.EXE HARDWORE\FusionAngle\ronghe.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE
+                    - INCDIR(..\..\Libraries\libraries;..\..\Libraries\seekfree_libraries;..\..\Libraries\seekfree_peripheral;..\USER\inc;..\
+                    -USER\src;..\CODE;.\HARDWORE\Data;.\HARDWORE\DianGan;.\HARDWORE\FusionAngle;.\HARDWORE\BianMaQi;.\HARDWORE\ShangWeiJi;.\H
+                    -ARDWORE;.\HARDWORE\Balance;.\KaErMan) DEBUG PRINT(.\Out_File\ronghe.lst) TABS(2) OBJECT(.\Out_File\ronghe.obj)
+
+line level    source
+
+   1          
+   2          #include "data.h"
+   3          #include "headfile.h"
+   4          #include "math.h"
+   5          /**
+   6          6050融合
+   7          mpu_acc_z用z轴数据
+   8          mpu_gyro_x用X轴数据
+   9          */
+  10          //#define TIME 1
+  11          //#define GYRO_INTERAL_P 0.01 //采样时间
+  12          //#define GYRO_P  0.65//此数值为gyro的信任度
+  13          //float acc_offset_z=-100;
+  14          //float gyro_offset_x=40;
+  15          //float f_Car_Angle_d = 0;
+  16          //float gyro_old = 0;
+  17          //float gyro_new = 0;
+  18          //float Angle_z_before = 0;
+  19          //float Angle_z = 0;
+  20          //void Angel_Calculate(){
+  21          //  //角速度处理部分
+  22          //  gyro_old = gyro_new;
+  23          //  gyro_new = mpu_gyro_x-gyro_offset_x;
+  24          //  gyro_new = (gyro_new*0.3+gyro_old*0.7)*GYRO_P;
+  25          //  //加速度处理部分
+  26          //  Angle_z_before = (mpu_acc_z-acc_offset_z)*0.088;//可以增加这个数值增加跟随度
+  27          //  Angle_z = g_f_Car_Angle_I;  
+  28          //  f_Car_Angle_d = (Angle_z_before-Angle_z)/TIME;
+  29          //  g_f_Car_Angle_I += (gyro_new+f_Car_Angle_d)*GYRO_INTERAL_P;
+  30          //}
+  31          
+  32          /**
+  33          角度融合方法
+  34          ICM20602
+  35          用z轴数据icm_acc_z
+  36          用X轴数据icm_gyro_x
+  37          */
+  38          #define TIME 1
+  39          #define GYRO_INTERAL_P 0.004 //采样时间
+  40          #define GYRO_P  0.65//此数值为gyro的信任度
+  41          float acc_offset_z=88;
+  42          float gyro_offset_x=30;
+  43          float f_Car_Angle_d = 0;
+  44          float gyro_old = 0;
+  45          float gyro_new = 0;
+  46          float Angle_z_before = 0;
+  47          float Angle_z = 0;
+  48          void Angel_Calculate(){
+  49   1        //角速度处理部分
+  50   1        gyro_old = gyro_new;
+  51   1        gyro_new = icm_gyro_x-gyro_offset_x;
+  52   1        gyro_new = (gyro_new*0.3+gyro_old*0.7)*GYRO_P;
+C51 COMPILER V9.57.0.0   RONGHE                                                            04/28/2021 20:58:27 PAGE 2   
+
+  53   1        //加速度处理部分
+  54   1        Angle_z_before = (icm_acc_z-acc_offset_z)*0.089;//可以增加这个数值增加跟随度
+  55   1        Angle_z = g_f_Car_Angle_I;  
+  56   1        f_Car_Angle_d = (Angle_z_before-Angle_z)/TIME;
+  57   1        g_f_Car_Angle_I += (gyro_new+f_Car_Angle_d)*GYRO_INTERAL_P;
+  58   1      }
+  59          
+  60          //void Cascade_pid(){
+  61          //  static float Stage = 0,StageOld = 0,StageLV = 0;
+  62          //  static float gf_Car_Anglespeed_Old = 0,
+  63          //                gyro_x = 0,gf_Car_Anglespeed_New = 0;
+  64          //  float fvalue;
+  65          //  anglecontroloutput();
+  66          //  gf_Car_Anglespeed_Old = gf_Car_Anglespeed_New;
+  67          //  gyro_x = get_gyro_x()-GyroOffset[0];
+  68          //  if(fabs(gyro_x<5)gyro_x = 0;
+  69          //  gf_Car_Anglespeed_New = gyro_x*0.377 + gf_Car_Anglespeed_Old*0.623;
+  70          //  StageOld = Stage;
+  71          //  Stage = gf_Car_Anglespeed_New - gf_Car_Anglespeed_Old;
+  72          //  StageLV = 0.623*StageOld  + 0.377*Stage;
+  73          //  fValue = -BalanceOut+gf_Car_Anglespeed_New*0.1*S_AGLE_CONTROL_P+StageLV*S_ANGLE_CONTROL_D;
+  74          //  KP1 = -BalanceOut;
+  75          //  KD1 = gf_Car_Anglespeed_New*S_AGLE_CONTROL_P;
+  76          //  Ca_Value = fValue;
+  77          //  if(Ca_Value>gf_Car_Anglespeed_New*S_AGLE_CONTRO_OUT_MAX){
+  78          //    Ca_Value = S_AGLE_CONTRO_OUT_MAX;
+  79          //  }
+  80          //  if(Ca_Value<S_AGLE_CONTRO_OUT_MIN){
+  81          //    Ca_Value = S_AGLE_CONTRO_OUT_MIN;
+  82          //  }
+  83          //}
+  84          
+  85          
+  86          
+  87          //void balance(void){
+  88          //  static float error = 0,errorold = 0;
+  89          //  BalanceOutOld = BalanceOutNew;
+  90          //  errorold = error;
+  91          //  error = Angle_Z - CAR_ANGLE_SET/**0.01*/;
+  92          //  if(error<-35)error = -35;
+  93          //  if(error>15)error = 15;
+  94          //  BalanceOutNew = ANGLE_CONTROL_P*error;
+  95          //  BalanceControlPeriod = 0;
+  96          //}
+  97          
+  98          
+  99          
+ 100          //void anglecontroloutput(void)
+ 101          //{
+ 102          //  float fValue  = 0;
+ 103          //  fValue = BalanceOutNew - BalanceOutOld;
+ 104          //  BalanceOut = fValue*(BalanceControlPeriod + 1)/5+BalanceOutOld;
+ 105          //  BalanceControlPeriod+=1;
+ 106          //}
+ 107          
+ 108          /**
+ 109          *@获得翻滚角度
+ 110          *@用于平衡的D
+ 111          */
+ 112          //#define KI 0.05    //对加速度计取值的权重
+ 113          //#define DT 0.01   //采样时间
+ 114          //float angle_ax = 0;
+C51 COMPILER V9.57.0.0   RONGHE                                                            04/28/2021 20:58:27 PAGE 3   
+
+ 115          //float gyro_gy = 0;
+ 116          //void fanGunAngle(){
+ 117          //  angle_ax = atan(mpu_acc_y/mpu_acc_z)*57.3;
+ 118          //  gyro_gy = mpu_gyro_x/7150.0;
+ 119          //  roll = KI*angle_ax + (1-KI)*(roll + gyro_gy*DT);
+ 120          //}
+ 121          
+ 122            
+ 123            
+ 124            
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    324    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     28    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

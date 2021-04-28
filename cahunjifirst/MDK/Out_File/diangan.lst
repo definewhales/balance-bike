@@ -1,0 +1,98 @@
+C51 COMPILER V9.57.0.0   DIANGAN                                                           04/28/2021 20:58:27 PAGE 1   
+
+
+C51 COMPILER V9.57.0.0, COMPILATION OF MODULE DIANGAN
+OBJECT MODULE PLACED IN .\Out_File\diangan.obj
+COMPILER INVOKED BY: E:\keil5\anzhuang\C51\BIN\C51.EXE HARDWORE\DianGan\diangan.c LARGE OMF2 OPTIMIZE(8,SPEED) BROWSE IN
+                    -CDIR(..\..\Libraries\libraries;..\..\Libraries\seekfree_libraries;..\..\Libraries\seekfree_peripheral;..\USER\inc;..\USE
+                    -R\src;..\CODE;.\HARDWORE\Data;.\HARDWORE\DianGan;.\HARDWORE\FusionAngle;.\HARDWORE\BianMaQi;.\HARDWORE\ShangWeiJi;.\HARD
+                    -WORE;.\HARDWORE\Balance;.\KaErMan) DEBUG PRINT(.\Out_File\diangan.lst) TABS(2) OBJECT(.\Out_File\diangan.obj)
+
+line level    source
+
+   1          #include "headfile.h"
+   2          
+   3          
+   4          float left_1,left_2,right_3,right_4;
+   5          float shuchu;
+   6          void diangan(void){
+   7   1      //  left_11[0]=adc_once(ADC_P10,ADC_10BIT);
+   8   1      //  left_11[1]=adc_once(ADC_P10,ADC_10BIT);
+   9   1      //  left_11[2]=adc_once(ADC_P10,ADC_10BIT);
+  10   1      //  left_11[3]=adc_once(ADC_P10,ADC_10BIT);
+  11   1      //  left_1=(left_11[0]+left_11[1]+left_11[2]+left_11[3])/4;
+  12   1      //  left_22[0]=adc_once(ADC_P11,ADC_10BIT);
+  13   1      //  left_22[1]=adc_once(ADC_P11,ADC_10BIT);
+  14   1      //  left_22[2]=adc_once(ADC_P11,ADC_10BIT);
+  15   1      //  left_22[3]=adc_once(ADC_P11,ADC_10BIT);
+  16   1      //  left_2=(left_22[0]+left_22[1]+left_22[2]+left_22[3])/4;
+  17   1      //  right_33[0]=adc_once(ADC_P14,ADC_10BIT);
+  18   1      //  right_33[1]=adc_once(ADC_P14,ADC_10BIT);
+  19   1      //  right_33[2]=adc_once(ADC_P14,ADC_10BIT);
+  20   1      //  right_33[3]=adc_once(ADC_P14,ADC_10BIT);
+  21   1      //  right_3=(right_33[0]+right_33[1]+right_33[2]+right_33[3])/4;
+  22   1      //  right_44[0]=adc_once(ADC_P15,ADC_10BIT);
+  23   1      //  right_44[1]=adc_once(ADC_P15,ADC_10BIT);
+  24   1      //  right_44[2]=adc_once(ADC_P15,ADC_10BIT);
+  25   1      //  right_44[3]=adc_once(ADC_P15,ADC_10BIT);
+  26   1      //  right_4=(right_44[0]+right_44[1]+right_44[2]+right_44[3])/4;
+  27   1        
+  28   1        
+  29   1      //  if(left_1+right_4!=0)
+  30   1      //    shuchu=(left_1-right_4)/(left_1+right_4);
+  31   1        
+  32   1        left_1=adc_once(ADC_P10,ADC_10BIT);
+  33   1        right_4=adc_once(ADC_P15,ADC_10BIT);
+  34   1        
+  35   1      }
+  36          
+  37          
+  38          
+  39          #define left_1_max 1024
+  40          #define right_4_max 1024
+  41          #define p 960//960
+  42          #define d 0
+  43          //pd控制35
+  44          float shuchu_diangan=0;
+  45          uint8 diangan_period=1;
+  46          float diangan_guiyi,diangan_new=0,diangan_last=0;
+  47          
+  48          void chuli_diangan(){
+  49   1      
+  50   1        left_1=left_1/left_1_max;
+  51   1        right_4=right_4/right_4_max;
+  52   1        if((left_1!=0)&&(right_4!=0)) diangan_guiyi=(left_1-right_4)/(left_1+right_4);
+C51 COMPILER V9.57.0.0   DIANGAN                                                           04/28/2021 20:58:27 PAGE 2   
+
+  53   1        diangan_last=diangan_new;
+  54   1        mpu6050_get_gyro();
+  55   1        diangan_new=p*diangan_guiyi-d*(mpu_gyro_x+485)*0.00305;
+  56   1        diangan_period=1;//周期比2： 1
+  57   1        }
+  58          
+  59          void diangan_shuchu(void){
+  60   1        
+  61   1        float fvalue=0;
+  62   1        fvalue=diangan_new-diangan_last;
+  63   1        shuchu_diangan=diangan_last+diangan_period*diangan_period*fvalue/2;
+  64   1        
+  65   1        diangan_period+=1;
+  66   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    421    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     37       4
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
